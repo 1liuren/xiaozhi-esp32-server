@@ -3,6 +3,7 @@ from dashscope.audio.tts import SpeechSynthesizer
 from core.providers.tts.base import TTSProviderBase
 from core.utils.util import check_model_key
 from config.logger import setup_logging
+import sys
 
 TAG = __name__
 logger = setup_logging()
@@ -63,32 +64,28 @@ class TTSProvider(TTSProviderBase):
             # 调用DashScope TTS服务
             result = SpeechSynthesizer.call(**call_params)
             
-            # 检查请求是否成功
-            if not result or not hasattr(result, 'get_response'):
-                raise Exception("DashScope TTS调用失败：无效的响应对象")
+            logger.bind(tag=TAG).info(f"DashScope TTS响应: {result}")
             
-            response = result.get_response()
-            if not response:
-                raise Exception("DashScope TTS调用失败：无响应数据")
-            
-            logger.bind(tag=TAG).info(f"DashScope TTS请求ID: {response.get('request_id', 'N/A')}")
-            
-            # 获取音频数据
-            audio_data = result.get_audio_data()
-            if audio_data is None:
-                raise Exception("DashScope TTS调用失败：无音频数据")
-            
-            # 处理输出
-            if output_file:
-                # 保存到文件
-                with open(output_file, 'wb') as f:
-                    f.write(audio_data)
-                logger.bind(tag=TAG).info(f"音频已保存到: {output_file}")
-                return output_file
+            # 检查响应
+            if result.get_audio_data() is not None:
+                audio_data = result.get_audio_data()
+                logger.bind(tag=TAG).info(f"成功获取音频数据，大小: {sys.getsizeof(audio_data)} 字节")
+                
+                # 处理输出
+                if output_file:
+                    # 保存到文件
+                    with open(output_file, 'wb') as f:
+                        f.write(audio_data)
+                    logger.bind(tag=TAG).info(f"音频已保存到: {output_file}")
+                    return output_file
+                else:
+                    # 返回音频二进制数据
+                    return audio_data
             else:
-                # 返回音频二进制数据
-                logger.bind(tag=TAG).info(f"返回音频数据，大小: {len(audio_data)} 字节")
-                return audio_data
+                # 打印错误详情
+                response = result.get_response()
+                logger.bind(tag=TAG).error(f"DashScope TTS调用失败，响应: {response}")
+                raise Exception(f"DashScope TTS调用失败：{response}")
                 
         except Exception as e:
             error_msg = f"阿里DashScope TTS请求失败: {str(e)}"
