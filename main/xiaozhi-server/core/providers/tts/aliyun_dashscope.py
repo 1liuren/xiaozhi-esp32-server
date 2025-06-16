@@ -50,7 +50,7 @@ class TTSProvider(TTSProviderBase):
             如果output_file为None，返回音频二进制数据；否则返回输出文件路径
         """
         try:
-            # 构建调用参数
+            # 根据DashScope官方文档构建调用参数
             call_params = {
                 'model': self.model,
                 'text': text,
@@ -58,20 +58,19 @@ class TTSProvider(TTSProviderBase):
                 'format': self.format
             }
             
-            # 如果配置了特定音色，添加到参数中
-            if self.voice:
-                call_params['voice'] = self.voice
-            
-            logger.bind(tag=TAG).debug(f"调用DashScope TTS - 参数: {call_params}")
+            logger.bind(tag=TAG).info(f"调用DashScope TTS - 参数: {call_params}")
             
             # 调用DashScope TTS服务
             result = SpeechSynthesizer.call(**call_params)
             
             # 检查请求是否成功
-            if not result.get_response():
-                raise Exception("DashScope TTS调用失败：无响应数据")
+            if not result or not hasattr(result, 'get_response'):
+                raise Exception("DashScope TTS调用失败：无效的响应对象")
             
             response = result.get_response()
+            if not response:
+                raise Exception("DashScope TTS调用失败：无响应数据")
+            
             logger.bind(tag=TAG).info(f"DashScope TTS请求ID: {response.get('request_id', 'N/A')}")
             
             # 获取音频数据
