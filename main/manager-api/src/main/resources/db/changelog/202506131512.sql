@@ -23,8 +23,8 @@ UPDATE `ai_model_config` SET
 
 -- 添加阿里DashScope TTS默认音色配置
 delete from `ai_tts_voice` where tts_model_id = 'TTS_AliyunDashScopeTTS';
-INSERT INTO `ai_tts_voice` VALUES ('TTS_AliyunDashScopeTTS_0001', 'TTS_AliyunDashScopeTTS', '知莺（女声）', 'sambert-zhiying-v1', '中文', NULL, NULL, 1, NULL, NULL, NULL, NULL);
-INSERT INTO `ai_tts_voice` VALUES ('TTS_AliyunDashScopeTTS_0002', 'TTS_AliyunDashScopeTTS', '知程（男声）', 'sambert-zhicheng-v1', '中文', NULL, NULL, 2, NULL, NULL, NULL, NULL);
-INSERT INTO `ai_tts_voice` VALUES ('TTS_AliyunDashScopeTTS_0003', 'TTS_AliyunDashScopeTTS', '知微（女声-温和）', 'sambert-zhiwei-v1', '中文', NULL, NULL, 3, NULL, NULL, NULL, NULL);
-INSERT INTO `ai_tts_voice` VALUES ('TTS_AliyunDashScopeTTS_0004', 'TTS_AliyunDashScopeTTS', '知浅（女声-活泼）', 'sambert-zhiqian-v1', '中文', NULL, NULL, 4, NULL, NULL, NULL, NULL);
-INSERT INTO `ai_tts_voice` VALUES ('TTS_AliyunDashScopeTTS_0005', 'TTS_AliyunDashScopeTTS', '知晨（男声-稳重）', 'sambert-zhichen-v1', '中文', NULL, NULL, 5, NULL, NULL, NULL, NULL); 
+INSERT INTO `ai_tts_voice` VALUES ('TTS_AliyunDashScopeTTS_0001', 'TTS_AliyunDashScopeTTS', '知莺', 'sambert-zhiying-v1', '中文', NULL, NULL, 1, NULL, NULL, NULL, NULL);
+INSERT INTO `ai_tts_voice` VALUES ('TTS_AliyunDashScopeTTS_0002', 'TTS_AliyunDashScopeTTS', '知程', 'sambert-zhicheng-v1', '中文', NULL, NULL, 2, NULL, NULL, NULL, NULL);
+INSERT INTO `ai_tts_voice` VALUES ('TTS_AliyunDashScopeTTS_0003', 'TTS_AliyunDashScopeTTS', '知微', 'sambert-zhiwei-v1', '中文', NULL, NULL, 3, NULL, NULL, NULL, NULL);
+INSERT INTO `ai_tts_voice` VALUES ('TTS_AliyunDashScopeTTS_0004', 'TTS_AliyunDashScopeTTS', '知浅', 'sambert-zhiqian-v1', '中文', NULL, NULL, 4, NULL, NULL, NULL, NULL);
+INSERT INTO `ai_tts_voice` VALUES ('TTS_AliyunDashScopeTTS_0005', 'TTS_AliyunDashScopeTTS', '知晨', 'sambert-zhichen-v1', '中文', NULL, NULL, 5, NULL, NULL, NULL, NULL); 
