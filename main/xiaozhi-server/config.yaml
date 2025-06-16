@@ -665,6 +665,28 @@ TTS:
     # volume: 50
     # speech_rate: 0
     # pitch_rate: 0
+  AliyunDashScopeTTS:
+    # 阿里云DashScope大模型语音合成服务
+    # 申请地址：https://dashscope.aliyun.com/
+    # API Key获取：https://dashscope.console.aliyun.com/apiKey
+    # 模型文档：https://help.aliyun.com/zh/dashscope/developer-reference/speech-synthesis-quick-start
+    type: aliyun_dashscope
+    output_dir: tmp/
+    # 您的DashScope API Key
+    api_key: 你的阿里云DashScope_API_Key
+    # 模型名称，支持多种音色模型
+    # sambert-zhiying-v1: 知莺音色（中文女声）
+    # sambert-zhicheng-v1: 知程音色（中文男声）
+    # sambert-zhiwei-v1: 知微音色（中文女声，温和亲切）
+    # sambert-zhiqian-v1: 知浅音色（中文女声，活泼可爱）
+    # sambert-zhichen-v1: 知晨音色（中文男声，稳重大气）
+    model: "sambert-zhiying-v1"
+    # 音频格式，支持wav、mp3、pcm
+    format: "wav"
+    # 采样率，支持8000、16000、22050、24000、44100、48000
+    sample_rate: 48000
+    # 可选：指定特定音色（如果模型支持）
+    # voice: "zhiying"
     # 添加 302.ai TTS 配置
     # token申请地址：https://dash.302.ai/
   TencentTTS:
