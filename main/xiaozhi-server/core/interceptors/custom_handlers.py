@@ -151,24 +151,16 @@ class UserBehaviorAnalyzer:
                     f"会话时长: {session['session_duration']:.2f}秒"
                 )
             
-            # 🔥 用户请求扣费逻辑
+            # 🔥 用户请求扣费逻辑 - 异步执行避免阻塞
             if request_info.message_type.startswith("text_") and isinstance(message, str):
                 try:
                     msg_json = json.loads(message)
                     # 只对用户实际的交互进行扣费（排除系统消息）
                     if msg_json.get("type") in ["listen", "hello"]:
                         if msg_json.get("type") == "listen" and msg_json.get("state") == "detect":
-                            # 用户发送了实际的对话内容
-                            success, user_info = self.user_manager.deduct_balance(device_id)
-                            
-                            if success:
-                                self.logger.bind(tag=TAG).info(
-                                    f"💰 用户扣费成功: [{device_id}] 扣除: 0.5, 余额: {user_info.balance}"
-                                )
-                            else:
-                                self.logger.bind(tag=TAG).warning(
-                                    f"💸 用户余额不足: [{device_id}] 当前余额: {user_info.balance}"
-                                )
+                            # 用户发送了实际的对话内容 - 在后台线程执行扣费
+                            loop = asyncio.get_event_loop()
+                            asyncio.create_task(self._deduct_balance_async(device_id))
                             
                             # 检测用户实际说话内容
                             if "text" in msg_json:
@@ -183,17 +175,47 @@ class UserBehaviorAnalyzer:
                                 # - 语音转文本质量评估
                         
                         elif msg_json.get("type") == "hello":
-                            # 用户连接时不扣费，但确保用户存在
-                            user_info = self.user_manager.get_or_create_user(device_id)
-                            self.logger.bind(tag=TAG).info(
-                                f"👋 用户连接: [{device_id}] 余额: {user_info.balance}"
-                            )
+                            # 用户连接时不扣费，但确保用户存在 - 在后台线程执行
+                            loop = asyncio.get_event_loop()
+                            asyncio.create_task(self._ensure_user_exists_async(device_id))
                         
                 except Exception as e:
                     self.logger.bind(tag=TAG).debug(f"处理用户扣费失败: {str(e)}")
                     
         except Exception as e:
             self.logger.bind(tag=TAG).error(f"用户行为分析失败: {str(e)}")
+    
+    async def _deduct_balance_async(self, device_id: str):
+        """异步执行用户扣费"""
+        try:
+            loop = asyncio.get_event_loop()
+            success, user_info = await loop.run_in_executor(
+                None, self.user_manager.deduct_balance, device_id
+            )
+            
+            if success:
+                self.logger.bind(tag=TAG).info(
+                    f"💰 用户扣费成功: [{device_id}] 扣除: 0.5, 余额: {user_info.balance}"
+                )
+            else:
+                self.logger.bind(tag=TAG).warning(
+                    f"💸 用户余额不足: [{device_id}] 当前余额: {user_info.balance}"
+                )
+        except Exception as e:
+            self.logger.bind(tag=TAG).error(f"异步扣费失败: {str(e)}")
+    
+    async def _ensure_user_exists_async(self, device_id: str):
+        """异步确保用户存在"""
+        try:
+            loop = asyncio.get_event_loop()
+            user_info = await loop.run_in_executor(
+                None, self.user_manager.get_or_create_user, device_id
+            )
+            self.logger.bind(tag=TAG).info(
+                f"👋 用户连接: [{device_id}] 余额: {user_info.balance}"
+            )
+        except Exception as e:
+            self.logger.bind(tag=TAG).error(f"异步确保用户存在失败: {str(e)}")
 
 
 # 工厂函数：根据配置创建处理器
