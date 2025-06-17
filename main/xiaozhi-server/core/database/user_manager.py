@@ -156,44 +156,97 @@ class UserManager:
         
         try:
             with self.lock:
-                # 获取当前用户信息
-                user = self.get_or_create_user(user_id)
-                
-                # 检查余额是否足够
-                if user.balance < amount:
-                    self.logger.bind(tag=TAG).warning(f"用户余额不足: {user_id}, 当前余额: {user.balance}, 需要: {amount}")
-                    return False, user
-                
-                # 更新用户信息
-                new_balance = user.balance - amount
-                new_requests = user.total_requests + 1
-                new_cost = user.total_cost + amount
                 current_time = datetime.now().isoformat()
                 
                 with sqlite3.connect(self.db_path) as conn:
                     cursor = conn.cursor()
+                    
+                    # 先尝试获取用户
+                    cursor.execute('''
+                        SELECT user_id, balance, battery, created_at, updated_at, 
+                               total_requests, total_cost
+                        FROM users WHERE user_id = ?
+                    ''', (user_id,))
+                    
+                    row = cursor.fetchone()
+                    
+                    if not row:
+                        # 用户不存在，创建新用户
+                        user_info = UserInfo(user_id=user_id)
+                        cursor.execute('''
+                            INSERT INTO users (user_id, balance, battery, created_at, 
+                                             updated_at, total_requests, total_cost)
+                            VALUES (?, ?, ?, ?, ?, ?, ?)
+                        ''', (
+                            user_info.user_id,
+                            user_info.balance,
+                            user_info.battery,
+                            user_info.created_at,
+                            user_info.updated_at,
+                            user_info.total_requests,
+                            user_info.total_cost
+                        ))
+                        current_balance = user_info.balance
+                        current_requests = user_info.total_requests
+                        current_cost = user_info.total_cost
+                        self.logger.bind(tag=TAG).info(f"创建新用户: {user_id}")
+                    else:
+                        current_balance = row[1]
+                        current_requests = row[5]
+                        current_cost = row[6]
+                    
+                    # 检查余额是否足够
+                    if current_balance < amount:
+                        conn.rollback()
+                        user = UserInfo(
+                            user_id=user_id,
+                            balance=current_balance,
+                            battery=row[2] if row else 100,
+                            created_at=row[3] if row else current_time,
+                            updated_at=row[4] if row else current_time,
+                            total_requests=current_requests,
+                            total_cost=current_cost
+                        )
+                        self.logger.bind(tag=TAG).warning(f"用户余额不足: {user_id}, 当前余额: {current_balance}, 需要: {amount}")
+                        return False, user
+                    
+                    # 执行扣费
+                    new_balance = current_balance - amount
+                    new_requests = current_requests + 1
+                    new_cost = current_cost + amount
+                    
                     cursor.execute('''
                         UPDATE users 
                         SET balance = ?, total_requests = ?, total_cost = ?, updated_at = ?
                         WHERE user_id = ?
                     ''', (new_balance, new_requests, new_cost, current_time, user_id))
+                    
                     conn.commit()
-                
-                # 更新用户对象
-                user.balance = new_balance
-                user.total_requests = new_requests
-                user.total_cost = new_cost
-                user.updated_at = current_time
-                
-                self.logger.bind(tag=TAG).info(
-                    f"用户扣费成功: {user_id}, 扣除: {amount}, 剩余: {new_balance}"
-                )
-                
-                return True, user
+                    
+                    # 构建返回的用户信息
+                    updated_user = UserInfo(
+                        user_id=user_id,
+                        balance=new_balance,
+                        battery=row[2] if row else 100,
+                        created_at=row[3] if row else current_time,
+                        updated_at=current_time,
+                        total_requests=new_requests,
+                        total_cost=new_cost
+                    )
+                    
+                    self.logger.bind(tag=TAG).info(
+                        f"用户扣费成功: {user_id}, 扣除: {amount}, 剩余: {new_balance}"
+                    )
+                    
+                    return True, updated_user
                 
         except Exception as e:
             self.logger.bind(tag=TAG).error(f"扣除余额失败: {str(e)}")
-            return False, self.get_or_create_user(user_id)
+            # 发生错误时返回当前用户信息
+            user = self.get_user(user_id)
+            if not user:
+                user = UserInfo(user_id=user_id)
+            return False, user
     
     def update_battery(self, user_id: str, battery: int) -> bool:
         """更新用户电量"""
