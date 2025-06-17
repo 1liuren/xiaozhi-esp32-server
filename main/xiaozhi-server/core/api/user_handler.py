@@ -1,4 +1,5 @@
 import json
+import asyncio
 from aiohttp import web
 from core.database.user_manager import get_user_manager
 from config.logger import setup_logging
@@ -25,8 +26,9 @@ class UserHandler:
                     "status": "invalid_param"
                 }, status=400)
             
-            # 获取用户信息
-            user = self.user_manager.get_user(user_id)
+            # 异步获取用户信息
+            loop = asyncio.get_event_loop()
+            user = await loop.run_in_executor(None, self.user_manager.get_user, user_id)
             
             if user is None:
                 return web.json_response({
@@ -49,7 +51,8 @@ class UserHandler:
     async def handle_get_all_users(self, request):
         """获取所有用户信息 - GET /users"""
         try:
-            users = self.user_manager.get_all_users()
+            loop = asyncio.get_event_loop()
+            users = await loop.run_in_executor(None, self.user_manager.get_all_users)
             
             users_data = [user.to_dict() for user in users]
             
@@ -78,8 +81,9 @@ class UserHandler:
                     "status": "invalid_param"
                 }, status=400)
             
-            # 检查用户是否已存在
-            existing_user = self.user_manager.get_user(user_id)
+            # 异步检查用户是否已存在
+            loop = asyncio.get_event_loop()
+            existing_user = await loop.run_in_executor(None, self.user_manager.get_user, user_id)
             if existing_user:
                 return web.json_response({
                     "error": "用户已存在",
@@ -87,8 +91,8 @@ class UserHandler:
                     "data": existing_user.to_dict()
                 }, status=409)
             
-            # 创建新用户
-            user = self.user_manager.create_user(user_id)
+            # 异步创建新用户
+            user = await loop.run_in_executor(None, self.user_manager.create_user, user_id)
             
             return web.json_response({
                 "status": "success",
@@ -122,11 +126,12 @@ class UserHandler:
                     "status": "invalid_amount"
                 }, status=400)
             
-            # 执行充值
-            success = self.user_manager.add_balance(user_id, amount)
+            # 异步执行充值
+            loop = asyncio.get_event_loop()
+            success = await loop.run_in_executor(None, self.user_manager.add_balance, user_id, amount)
             
             if success:
-                user = self.user_manager.get_user(user_id)
+                user = await loop.run_in_executor(None, self.user_manager.get_user, user_id)
                 return web.json_response({
                     "status": "success",
                     "message": f"充值成功，充值金额: {amount}",
@@ -164,11 +169,12 @@ class UserHandler:
                     "status": "invalid_battery"
                 }, status=400)
             
-            # 更新电量
-            success = self.user_manager.update_battery(user_id, battery)
+            # 异步更新电量
+            loop = asyncio.get_event_loop()
+            success = await loop.run_in_executor(None, self.user_manager.update_battery, user_id, battery)
             
             if success:
-                user = self.user_manager.get_user(user_id)
+                user = await loop.run_in_executor(None, self.user_manager.get_user, user_id)
                 return web.json_response({
                     "status": "success",
                     "message": f"电量更新成功: {battery}%",
@@ -190,7 +196,8 @@ class UserHandler:
     async def handle_get_stats(self, request):
         """获取用户统计信息 - GET /users/stats"""
         try:
-            stats = self.user_manager.get_stats()
+            loop = asyncio.get_event_loop()
+            stats = await loop.run_in_executor(None, self.user_manager.get_stats)
             
             return web.json_response({
                 "status": "success",
