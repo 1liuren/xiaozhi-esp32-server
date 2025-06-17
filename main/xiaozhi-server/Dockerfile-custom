@@ -1,0 +1,15 @@
+# 基于官方镜像的自定义版本
+FROM ghcr.nju.edu.cn/xinnan-tech/xiaozhi-esp32-server:server_latest
+
+# 复制修改后的代码
+COPY core/interceptors /opt/xiaozhi-esp32-server/core/interceptors
+COPY core/api/interceptor_handler.py /opt/xiaozhi-esp32-server/core/api/
+COPY core/connection.py /opt/xiaozhi-esp32-server/core/
+COPY core/http_server.py /opt/xiaozhi-esp32-server/core/
+COPY config.yaml /opt/xiaozhi-esp32-server/
+
+# 确保权限正确
+RUN chmod +x /opt/xiaozhi-esp32-server/app.py
+
+# 启动应用
+CMD ["python", "app.py"] 

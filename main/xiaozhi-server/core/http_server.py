@@ -4,6 +4,7 @@ from config.logger import setup_logging
 from core.api.ota_handler import OTAHandler
 from core.api.vision_handler import VisionHandler
 from core.api.interceptor_handler import InterceptorHandler
+from core.api.user_handler import UserHandler
 
 TAG = __name__
 
@@ -15,6 +16,7 @@ class SimpleHttpServer:
         self.ota_handler = OTAHandler(config)
         self.vision_handler = VisionHandler(config)
         self.interceptor_handler = InterceptorHandler(config)
+        self.user_handler = UserHandler(config)
 
     def _get_websocket_url(self, local_ip: str, port: int) -> str:
         """获取websocket地址
@@ -62,6 +64,15 @@ class SimpleHttpServer:
                     # 添加拦截器监控接口
                     web.get("/interceptor/status", self.interceptor_handler.handle_get),
                     web.post("/interceptor/control", self.interceptor_handler.handle_post),
+                    # 🔥 添加用户管理接口
+                    web.get("/users", self.user_handler.handle_get_all_users),
+                    web.get("/users/stats", self.user_handler.handle_get_stats),
+                    web.get("/users/{user_id}", self.user_handler.handle_get_user),
+                    web.post("/users", self.user_handler.handle_create_user),
+                    web.post("/users/{user_id}/recharge", self.user_handler.handle_recharge),
+                    web.post("/users/{user_id}/battery", self.user_handler.handle_update_battery),
+                    web.options("/users", self.user_handler.handle_options),
+                    web.options("/users/{user_id}", self.user_handler.handle_options),
                 ]
             )
 

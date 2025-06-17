@@ -4,6 +4,7 @@ import asyncio
 from typing import Dict, Any
 from datetime import datetime
 from config.logger import setup_logging
+from core.database.user_manager import get_user_manager
 
 TAG = __name__
 
@@ -116,6 +117,7 @@ class UserBehaviorAnalyzer:
         self.config = config
         self.logger = setup_logging()
         self.user_sessions = {}  # 存储用户会话信息
+        self.user_manager = get_user_manager()  # 用户管理器
         
     async def handle_request(self, request_info, message):
         """分析用户行为"""
@@ -149,23 +151,46 @@ class UserBehaviorAnalyzer:
                     f"会话时长: {session['session_duration']:.2f}秒"
                 )
             
-            # 检测用户实际说话内容
-            if isinstance(message, str) and request_info.message_type.startswith("text_"):
+            # 🔥 用户请求扣费逻辑
+            if request_info.message_type.startswith("text_") and isinstance(message, str):
                 try:
                     msg_json = json.loads(message)
-                    if msg_json.get("type") == "listen" and "text" in msg_json:
-                        user_text = msg_json["text"]
-                        # 🔥 这里是用户实际说话的内容
-                        self.logger.bind(tag=TAG).info(f"用户说话: [{device_id}] {user_text}")
+                    # 只对用户实际的交互进行扣费（排除系统消息）
+                    if msg_json.get("type") in ["listen", "hello"]:
+                        if msg_json.get("type") == "listen" and msg_json.get("state") == "detect":
+                            # 用户发送了实际的对话内容
+                            success, user_info = self.user_manager.deduct_balance(device_id)
+                            
+                            if success:
+                                self.logger.bind(tag=TAG).info(
+                                    f"💰 用户扣费成功: [{device_id}] 扣除: 0.5, 余额: {user_info.balance}"
+                                )
+                            else:
+                                self.logger.bind(tag=TAG).warning(
+                                    f"💸 用户余额不足: [{device_id}] 当前余额: {user_info.balance}"
+                                )
+                            
+                            # 检测用户实际说话内容
+                            if "text" in msg_json:
+                                user_text = msg_json["text"]
+                                # 🔥 这里是用户实际说话的内容
+                                self.logger.bind(tag=TAG).info(f"用户说话: [{device_id}] {user_text}")
+                                
+                                # 您可以在这里进行进一步分析：
+                                # - 情感分析
+                                # - 关键词提取
+                                # - 意图识别
+                                # - 语音转文本质量评估
                         
-                        # 您可以在这里进行进一步分析：
-                        # - 情感分析
-                        # - 关键词提取
-                        # - 意图识别
-                        # - 语音转文本质量评估
+                        elif msg_json.get("type") == "hello":
+                            # 用户连接时不扣费，但确保用户存在
+                            user_info = self.user_manager.get_or_create_user(device_id)
+                            self.logger.bind(tag=TAG).info(
+                                f"👋 用户连接: [{device_id}] 余额: {user_info.balance}"
+                            )
                         
                 except Exception as e:
-                    self.logger.bind(tag=TAG).debug(f"解析用户消息失败: {str(e)}")
+                    self.logger.bind(tag=TAG).debug(f"处理用户扣费失败: {str(e)}")
                     
         except Exception as e:
             self.logger.bind(tag=TAG).error(f"用户行为分析失败: {str(e)}")
