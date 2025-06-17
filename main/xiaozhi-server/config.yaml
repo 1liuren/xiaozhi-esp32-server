@@ -5,6 +5,27 @@
 # 如果你使用了智控台，那么以下所有配置，都不会生效，请在智控台中修改配置
 
 # #####################################################################################
+# #############################以下是请求拦截器配置####################################
+# 请求拦截器配置 - 用于截获和处理所有用户请求
+request_interceptor:
+  # 是否启用请求拦截器
+  enabled: true
+  # 是否记录请求日志
+  log_requests: true
+  # 是否启用调试模式（会打印详细的请求信息）
+  debug: false
+  # 异步处理的最大工作线程数
+  max_workers: 10
+  # 自定义处理器配置
+  custom_handlers:
+    # 是否启用数据库存储
+    database_storage: false
+    # 是否启用消息队列
+    message_queue: false
+    # 是否启用外部API调用
+    external_api: false
+
+# #####################################################################################
 # #############################以下是服务器基本运行配置####################################
 server:
   # 服务器监听地址和端口(Server listening address and port)
@@ -158,7 +179,7 @@ end_prompt:
   enable: true # 是否开启结束语
   # 结束语
   prompt: |
-    请你以“时间过得真快”未来头，用富有感情、依依不舍的话来结束这场对话吧！
+    请你以"时间过得真快"未来头，用富有感情、依依不舍的话来结束这场对话吧！
 
 # 具体处理时选择的模块(The module selected for specific processing)
 selected_module:
@@ -195,7 +216,7 @@ Intent:
     # 如果你的不想使用selected_module.LLM意图识别，这里最好使用独立的LLM作为意图识别，例如使用免费的ChatGLMLLM
     llm: ChatGLMLLM
     # plugins_func/functions下的模块，可以通过配置，选择加载哪个模块，加载后对话支持相应的function调用
-    # 系统默认已经记载“handle_exit_intent(退出识别)”、“play_music(音乐播放)”插件，请勿重复加载
+    # 系统默认已经记载"handle_exit_intent(退出识别)"、"play_music(音乐播放)"插件，请勿重复加载
     # 下面是加载查天气、角色切换、加载查新闻的插件示例
     functions:
       - get_weather
@@ -205,7 +226,7 @@ Intent:
     # 不需要动type
     type: function_call
     # plugins_func/functions下的模块，可以通过配置，选择加载哪个模块，加载后对话支持相应的function调用
-    # 系统默认已经记载“handle_exit_intent(退出识别)”、“play_music(音乐播放)”插件，请勿重复加载
+    # 系统默认已经记载"handle_exit_intent(退出识别)"、"play_music(音乐播放)"插件，请勿重复加载
     # 下面是加载查天气、角色切换、加载查新闻的插件示例
     functions:
       - change_role

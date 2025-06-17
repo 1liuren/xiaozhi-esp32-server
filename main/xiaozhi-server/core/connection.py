@@ -19,6 +19,7 @@ from core.utils.util import (
 )
 from typing import Dict, Any
 from core.mcp.manager import MCPManager
+from core.interceptors.message_interceptor import get_interceptor
 from core.utils.modules_initialize import (
     initialize_modules,
     initialize_tts,
@@ -151,6 +152,9 @@ class ConnectionHandler:
 
         # {"mcp":true} 表示启用MCP功能
         self.features = None
+        
+        # 初始化消息拦截器
+        self.message_interceptor = get_interceptor(self.config)
 
     async def handle_connection(self, ws):
         try:
@@ -252,6 +256,13 @@ class ConnectionHandler:
         """消息路由"""
         # 重置超时计时器
         await self.reset_timeout()
+        
+        # 🔥 消息拦截 - 在这里截获所有用户消息
+        if self.message_interceptor:
+            try:
+                message = await self.message_interceptor.intercept_message(self, message)
+            except Exception as e:
+                self.logger.bind(tag=TAG).error(f"消息拦截失败: {str(e)}")
 
         if isinstance(message, str):
             await handleTextMessage(self, message)
@@ -932,6 +943,13 @@ class ConnectionHandler:
 
             # 清空任务队列
             self.clear_queues()
+            
+            # 关闭消息拦截器
+            if hasattr(self, 'message_interceptor') and self.message_interceptor:
+                try:
+                    self.message_interceptor.close()
+                except Exception as e:
+                    self.logger.bind(tag=TAG).debug(f"关闭消息拦截器失败: {e}")
 
             # 关闭WebSocket连接
             if ws:

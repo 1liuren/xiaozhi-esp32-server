@@ -1,4 +1,7 @@
+import os
+import uuid
 import dashscope
+from datetime import datetime
 from dashscope.audio.tts import SpeechSynthesizer
 from core.providers.tts.base import TTSProviderBase
 from core.utils.util import check_model_key
@@ -38,6 +41,13 @@ class TTSProvider(TTSProviderBase):
             self.voice = config.get("voice", None)
         
         logger.bind(tag=TAG).info(f"初始化阿里DashScope TTS - 模型: {self.model}, 采样率: {self.sample_rate}, 格式: {self.format}")
+
+    def generate_filename(self, extension=".wav"):
+        """生成临时文件名"""
+        return os.path.join(
+            self.output_file,
+            f"tts-{datetime.now().date()}@{uuid.uuid4().hex}{extension}",
+        )
 
     async def text_to_speak(self, text, output_file):
         """
