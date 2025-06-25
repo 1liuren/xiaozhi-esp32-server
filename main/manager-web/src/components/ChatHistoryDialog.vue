@@ -21,7 +21,7 @@
                             {{ message.content }}
                         </div>
                         <div v-else class="message-item" :class="{ 'user-message': message.chatType === 1 }">
-                            <img :src="message.chatType === 1 ? getUserAvatar(currentSessionId) : require('@/assets/xiaozhi-logo.png')"
+                            <img :src="message.chatType === 1 ? getUserAvatar(currentSessionId) : getAIAvatar()"
                                 class="avatar" />
                             <div class="message-content">
                                 {{ message.content }}
@@ -266,6 +266,10 @@ export default {
 
             // 返回对应的头像图片
             return require(`@/assets/user-avatar${avatarIndex}.png`);
+        },
+        getAIAvatar() {
+            // 返回AI助手的默认头像
+            return require('@/assets/user-avatar1.png'); // 临时使用现有头像，后续可以自定义AI头像
         }
     }
 };

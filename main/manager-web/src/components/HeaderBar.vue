@@ -3,61 +3,78 @@
     <div class="header-container">
       <!-- 左侧元素 -->
       <div class="header-left" @click="goHome">
-        <img loading="lazy" alt="" src="@/assets/xiaozhi-logo.png" class="logo-img" />
-        <img loading="lazy" alt="" src="@/assets/xiaozhi-ai.png" class="brand-img" />
+        <div class="brand-container">
+          <div class="brand-icon">🧠</div>
+          <div class="brand-text">
+            <span class="brand-name">幻话科技</span>
+            <span class="brand-subtitle">AI Intelligence</span>
+          </div>
+        </div>
       </div>
 
       <!-- 中间导航菜单 -->
       <div class="header-center">
-        <div class="equipment-management"
-          :class="{ 'active-tab': $route.path === '/home' || $route.path === '/role-config' || $route.path === '/device-management' }"
-          @click="goHome">
-          <img loading="lazy" alt="" src="@/assets/header/robot.png"
-            :style="{ filter: $route.path === '/home' || $route.path === '/role-config' || $route.path === '/device-management' ? 'brightness(0) invert(1)' : 'None' }" />
-          智能体管理
+        <div class="nav-menu-container">
+          <!-- 核心菜单 -->
+          <div class="nav-item primary-nav"
+            :class="{ 'active-tab': $route.path === '/home' || $route.path === '/role-config' || $route.path === '/device-management' }"
+            @click="goHome">
+            <span class="nav-icon">🤖</span>
+            <span class="nav-text">AI助手</span>
+          </div>
+          
+          <!-- 管理员菜单 -->
+          <template v-if="isSuperAdmin">
+            <div class="nav-item"
+              :class="{ 'active-tab': $route.path === '/model-config' }"
+              @click="goModelConfig">
+              <span class="nav-icon">⚙️</span>
+              <span class="nav-text">模型</span>
+            </div>
+            
+            <div class="nav-item"
+              :class="{ 'active-tab': $route.path === '/user-management' }"
+              @click="goUserManagement">
+              <span class="nav-icon">👥</span>
+              <span class="nav-text">用户</span>
+            </div>
+            
+            <div class="nav-item"
+              :class="{ 'active-tab': $route.path === '/ota-management' }"
+              @click="goOtaManagement">
+              <span class="nav-icon">🔄</span>
+              <span class="nav-text">更新</span>
+            </div>
+            
+            <el-dropdown trigger="click" class="nav-item nav-dropdown"
+              :class="{ 'active-tab': $route.path === '/dict-management' || $route.path === '/params-management' || $route.path === '/provider-management' || $route.path === '/server-side-management' }"
+              @visible-change="handleParamDropdownVisibleChange">
+              <span class="el-dropdown-link">
+                <span class="nav-icon">📊</span>
+                <span class="nav-text">系统</span>
+                <i class="el-icon-arrow-down" :class="{ 'rotate-down': paramDropdownVisible }"></i>
+              </span>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item @click.native="goParamManagement">
+                  <span class="dropdown-icon">⚙️</span>
+                  参数管理
+                </el-dropdown-item>
+                <el-dropdown-item @click.native="goDictManagement">
+                  <span class="dropdown-icon">📖</span>
+                  字典管理
+                </el-dropdown-item>
+                <el-dropdown-item @click.native="goProviderManagement">
+                  <span class="dropdown-icon">🔧</span>
+                  字段管理
+                </el-dropdown-item>
+                <el-dropdown-item @click.native="goServerSideManagement">
+                  <span class="dropdown-icon">🖥️</span>
+                  服务端管理
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </template>
         </div>
-        <div v-if="isSuperAdmin" class="equipment-management" :class="{ 'active-tab': $route.path === '/model-config' }"
-          @click="goModelConfig">
-          <img loading="lazy" alt="" src="@/assets/header/model_config.png"
-            :style="{ filter: $route.path === '/model-config' ? 'brightness(0) invert(1)' : 'None' }" />
-          模型配置
-        </div>
-        <div v-if="isSuperAdmin" class="equipment-management"
-          :class="{ 'active-tab': $route.path === '/user-management' }" @click="goUserManagement">
-          <img loading="lazy" alt="" src="@/assets/header/user_management.png"
-            :style="{ filter: $route.path === '/user-management' ? 'brightness(0) invert(1)' : 'None' }" />
-          用户管理
-        </div>
-        <div v-if="isSuperAdmin" class="equipment-management"
-          :class="{ 'active-tab': $route.path === '/ota-management' }" @click="goOtaManagement">
-          <img loading="lazy" alt="" src="@/assets/header/firmware_update.png"
-            :style="{ filter: $route.path === '/ota-management' ? 'brightness(0) invert(1)' : 'None' }" />
-          OTA管理
-        </div>
-        <el-dropdown v-if="isSuperAdmin" trigger="click" class="equipment-management more-dropdown"
-          :class="{ 'active-tab': $route.path === '/dict-management' || $route.path === '/params-management' || $route.path === '/provider-management' || $route.path === '/server-side-management' }"
-          @visible-change="handleParamDropdownVisibleChange">
-          <span class="el-dropdown-link">
-            <img loading="lazy" alt="" src="@/assets/header/param_management.png"
-              :style="{ filter: $route.path === '/dict-management' || $route.path === '/params-management' || $route.path === '/provider-management' || $route.path === '/server-side-management' ? 'brightness(0) invert(1)' : 'None' }" />
-            参数字典
-            <i class="el-icon-arrow-down el-icon--right" :class="{ 'rotate-down': paramDropdownVisible }"></i>
-          </span>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item @click.native="goParamManagement">
-              参数管理
-            </el-dropdown-item>
-            <el-dropdown-item @click.native="goDictManagement">
-              字典管理
-            </el-dropdown-item>
-            <el-dropdown-item @click.native="goProviderManagement">
-              字段管理
-            </el-dropdown-item>
-            <el-dropdown-item @click.native="goServerSideManagement">
-              服务端管理
-            </el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
       </div>
 
       <!-- 右侧元素 -->
@@ -224,12 +241,14 @@ export default {
 
 <style lang="scss" scoped>
 .header {
-  background: #f6fcfe66;
-  border: 1px solid #fff;
-  height: 63px !important;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: none;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+  height: 70px !important;
   min-width: 900px;
-  /* 设置最小宽度防止过度压缩 */
-  overflow: hidden;
+  position: relative;
+  z-index: 100;
 }
 
 .header-container {
@@ -237,70 +256,165 @@ export default {
   justify-content: space-between;
   align-items: center;
   height: 100%;
-  padding: 0 10px;
+  padding: 0 20px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-width: 120px;
+  min-width: 200px;
+  cursor: pointer;
 }
 
-.logo-img {
-  width: 42px;
-  height: 42px;
+.brand-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.3s ease;
 }
 
-.brand-img {
-  height: 20px;
+.brand-container:hover {
+  transform: scale(1.05);
+}
+
+.brand-icon {
+  font-size: 28px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  width: 45px;
+  height: 45px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.brand-name {
+  font-size: 18px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+}
+
+.brand-subtitle {
+  font-size: 11px;
+  color: #718096;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .header-center {
   display: flex;
   align-items: center;
-  gap: 25px;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  flex: 1;
+  justify-content: center;
+  max-width: 900px;
+  margin: 0 30px;
+  padding: 8px 0;
+}
+
+.nav-menu-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  padding: 6px;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .header-right {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 12px;
   min-width: 300px;
   justify-content: flex-end;
 }
 
-.equipment-management {
-  height: 30px;
-  border-radius: 15px;
-  background: #deeafe;
+.nav-item {
+  height: 40px;
+  border-radius: 20px;
+  background: transparent;
   display: flex;
   justify-content: center;
-  font-size: 14px;
-  font-weight: 500;
-  gap: 7px;
-  color: #3d4566;
-  margin-left: 1px;
+  font-size: 13px;
+  font-weight: 600;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.8);
   align-items: center;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   flex-shrink: 0;
-  /* 防止导航按钮被压缩 */
-  padding: 0 15px;
+  padding: 0 16px;
   position: relative;
+  white-space: nowrap;
+  min-width: 80px;
+  text-align: center;
 }
 
-.equipment-management.active-tab {
-  background: #5778ff !important;
+.nav-item.primary-nav {
+  min-width: 100px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.nav-item.active-tab {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%) !important;
   color: #fff !important;
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+  transform: translateY(-1px);
 }
 
-.equipment-management img {
-  width: 15px;
-  height: 13px;
+.nav-item.active-tab:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5);
+}
+
+.nav-icon {
+  font-size: 16px;
+  transition: all 0.3s ease;
+  opacity: 0.9;
+}
+
+.nav-text {
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.nav-item:hover .nav-icon {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.nav-item.active-tab .nav-icon {
+  opacity: 1;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
 }
 
 .search-container {
@@ -345,53 +459,178 @@ export default {
   flex-shrink: 0;
 }
 
-.more-dropdown {
-  padding-right: 20px;
+.nav-dropdown {
+  position: relative;
 }
 
-.more-dropdown .el-dropdown-link {
+.nav-dropdown .el-dropdown-link {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
+  width: 100%;
+  justify-content: center;
+  color: inherit;
+  text-decoration: none;
 }
 
 .rotate-down {
   transform: rotate(180deg);
-  transition: transform 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .el-icon-arrow-down {
-  transition: transform 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 12px;
+  opacity: 0.7;
+  margin-left: 4px;
+}
+
+.nav-item:hover .el-icon-arrow-down {
+  opacity: 1;
+}
+
+.nav-item.active-tab .el-icon-arrow-down {
+  opacity: 1;
+  color: white;
 }
 
 /* 响应式调整 */
-@media (max-width: 1200px) {
+@media (max-width: 1400px) {
   .header-center {
-    gap: 14px;
+    margin: 0 20px;
   }
 
-  .equipment-management {
-    width: 79px;
-    font-size: 9px;
+  .nav-menu-container {
+    gap: 4px;
+    padding: 4px;
+  }
+
+  .nav-item {
+    min-width: 70px;
+    padding: 0 14px;
+    font-size: 12px;
+  }
+
+  .nav-item.primary-nav {
+    min-width: 85px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .header-center {
+    margin: 0 15px;
+  }
+
+  .nav-item {
+    min-width: 60px;
+    padding: 0 12px;
+    font-size: 11px;
+    height: 36px;
+    border-radius: 18px;
+  }
+
+  .nav-item.primary-nav {
+    min-width: 75px;
+  }
+
+  .nav-icon {
+    font-size: 14px;
+  }
+
+  .nav-text {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .nav-menu-container {
+    gap: 2px;
+  }
+
+  .nav-item {
+    min-width: 50px;
+    padding: 0 10px;
+    font-size: 10px;
+    height: 32px;
+    border-radius: 16px;
+  }
+
+  .nav-item.primary-nav {
+    min-width: 65px;
+  }
+
+  .nav-icon {
+    font-size: 12px;
+  }
+
+  .nav-text {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 800px) {
+  .nav-item .nav-text {
+    display: none;
+  }
+
+  .nav-item {
+    min-width: 40px;
+    padding: 0 8px;
+  }
+
+  .nav-item.primary-nav {
+    min-width: 45px;
   }
 }
 
 .equipment-management.more-dropdown {
   position: relative;
 }
-
-.equipment-management.more-dropdown .el-dropdown-menu {
-  position: absolute;
-  right: 0;
-  min-width: 120px;
-  margin-top: 5px;
+  white-space: nowrap;
 }
 
-.el-dropdown-menu__item {
-  min-width: 60px;
-  padding: 8px 20px;
+/* 下拉菜单图标样式 */
+.dropdown-icon {
   font-size: 14px;
-  color: #606266;
-  white-space: nowrap;
+  margin-right: 8px;
+  opacity: 0.8;
+}
+
+/* 全局下拉菜单样式 */
+::v-deep .el-dropdown-menu {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  padding: 8px 0;
+  margin-top: 8px;
+  min-width: 140px;
+}
+
+::v-deep .el-dropdown-menu__item {
+  padding: 12px 20px;
+  font-size: 13px;
+  color: #4a5568;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+}
+
+::v-deep .el-dropdown-menu__item:hover {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  color: white;
+  transform: translateX(4px);
+}
+
+::v-deep .el-dropdown-menu__item:hover .dropdown-icon {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+::v-deep .el-dropdown-menu__item:not(:last-child) {
+  border-bottom: 1px solid rgba(102, 126, 234, 0.05);
 }
 </style>

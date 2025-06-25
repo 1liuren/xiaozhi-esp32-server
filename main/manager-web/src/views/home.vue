@@ -53,7 +53,12 @@
                 <div class="card-icon">⚡</div>
                 <div class="card-text">实时响应</div>
               </div>
-              <div class="hero-circle"></div>
+                             <div class="hero-circle">
+                 <div class="circle-content">
+                   <div class="circle-icon">🌟</div>
+                   <div class="circle-text">AI Core</div>
+                 </div>
+               </div>
             </div>
           </div>
         </div>
@@ -406,6 +411,32 @@ export default {
   border: 1px solid rgba(255, 255, 255, 0.2);
   transform: translate(-50%, -50%);
   animation: pulse 4s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.circle-content {
+  text-align: center;
+  color: white;
+}
+
+.circle-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+  animation: rotate 8s linear infinite;
+}
+
+.circle-text {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 @keyframes pulse {
