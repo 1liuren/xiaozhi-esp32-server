@@ -424,7 +424,7 @@ export default {
   max-width: 220px;
 }
 
-.custom-search-input::v-deep .el-input__inner {
+.custom-search-input /deep/ .el-input__inner {
   height: 30px;
   border-radius: 15px;
   background-color: #fff;
@@ -443,7 +443,7 @@ export default {
   line-height: 30px;
 }
 
-.custom-search-input::v-deep .el-input__suffix-inner {
+.custom-search-input /deep/ .el-input__suffix-inner {
   display: flex;
   align-items: center;
   height: 100%;
@@ -585,7 +585,6 @@ export default {
 
 .equipment-management.more-dropdown {
   position: relative;
-}
   white-space: nowrap;
 }
 
@@ -595,9 +594,11 @@ export default {
   margin-right: 8px;
   opacity: 0.8;
 }
+</style>
 
-/* 全局下拉菜单样式 */
-::v-deep .el-dropdown-menu {
+<style lang="scss">
+/* 全局下拉菜单样式 - 不使用scoped */
+.el-dropdown-menu {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(102, 126, 234, 0.1);
@@ -608,7 +609,7 @@ export default {
   min-width: 140px;
 }
 
-::v-deep .el-dropdown-menu__item {
+.el-dropdown-menu__item {
   padding: 12px 20px;
   font-size: 13px;
   color: #4a5568;
@@ -619,18 +620,18 @@ export default {
   align-items: center;
 }
 
-::v-deep .el-dropdown-menu__item:hover {
+.el-dropdown-menu__item:hover {
   background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
   color: white;
   transform: translateX(4px);
 }
 
-::v-deep .el-dropdown-menu__item:hover .dropdown-icon {
+.el-dropdown-menu__item:hover .dropdown-icon {
   opacity: 1;
   transform: scale(1.1);
 }
 
-::v-deep .el-dropdown-menu__item:not(:last-child) {
+.el-dropdown-menu__item:not(:last-child) {
   border-bottom: 1px solid rgba(102, 126, 234, 0.05);
 }
 </style>
