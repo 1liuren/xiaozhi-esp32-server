@@ -2,38 +2,74 @@
   <div class="welcome">
     <!-- 公共头部 -->
     <HeaderBar :devices="devices" @search="handleSearch" @search-reset="handleSearchReset" />
-    <el-main style="padding: 20px;display: flex;flex-direction: column;">
-      <div>
-        <!-- 首页内容 -->
-        <div class="add-device">
-          <div class="add-device-bg">
-            <div class="hellow-text" style="margin-top: 30px;">
-              你好，幻话
+    
+    <!-- 主要内容区 -->
+    <div class="main-content">
+      <!-- 欢迎横幅区域 -->
+      <div class="hero-banner">
+        <div class="hero-content">
+          <div class="hero-left">
+            <div class="greeting-section">
+              <h1 class="main-greeting">你好，幻话</h1>
+              <p class="sub-greeting">开启智能对话新体验</p>
+              <p class="welcome-desc">Welcome to the future of AI conversation</p>
             </div>
-            <div class="hellow-text">
-              让我们度过
-              <div style="display: inline-block;color: #5778FF;">
-                美好的一天！
+            
+            <div class="action-section">
+              <button class="primary-btn" @click="showAddDialog">
+                <i class="el-icon-plus"></i>
+                创建智能体
+              </button>
+              <button class="secondary-btn" @click="goToRoleConfig">
+                <i class="el-icon-setting"></i>
+                配置管理
+              </button>
+            </div>
+            
+            <div class="stats-section">
+              <div class="stat-item">
+                <span class="stat-number">{{ devices.length }}</span>
+                <span class="stat-label">智能体</span>
               </div>
-            </div>
-            <div class="hi-hint">
-              Hello, Let's have a wonderful day!
-            </div>
-            <div class="add-device-btn">
-              <div class="left-add" @click="showAddDialog">
-                添加智能体
-              </div>
-              <div style="width: 23px;height: 13px;background: #5778ff;margin-left: -10px;" />
-              <div class="right-add">
-                <i class="el-icon-right" @click="showAddDialog" style="font-size: 20px;color: #fff;" />
+              <div class="stat-divider"></div>
+              <div class="stat-item">
+                <span class="stat-number">{{ devices.filter(d => d.deviceCount > 0).length }}</span>
+                <span class="stat-label">在线设备</span>
               </div>
             </div>
           </div>
+          
+          <div class="hero-right">
+            <div class="hero-visual">
+              <div class="floating-card card-1">
+                <div class="card-icon">🤖</div>
+                <div class="card-text">AI 助手</div>
+              </div>
+              <div class="floating-card card-2">
+                <div class="card-icon">💬</div>
+                <div class="card-text">智能对话</div>
+              </div>
+              <div class="floating-card card-3">
+                <div class="card-icon">⚡</div>
+                <div class="card-text">实时响应</div>
+              </div>
+              <div class="hero-circle"></div>
+            </div>
+          </div>
         </div>
-        <div class="device-list-container">
+      </div>
+
+      <!-- 智能体列表区域 -->
+      <div class="agents-section">
+        <div class="section-header">
+          <h2 class="section-title">我的智能体</h2>
+          <p class="section-subtitle">管理您的AI助手集合</p>
+        </div>
+        
+        <div class="agents-grid">
           <template v-if="isLoading">
-            <div v-for="i in skeletonCount" :key="'skeleton-' + i" class="skeleton-item">
-              <div class="skeleton-image"></div>
+            <div v-for="i in skeletonCount" :key="'skeleton-' + i" class="skeleton-card">
+              <div class="skeleton-header"></div>
               <div class="skeleton-content">
                 <div class="skeleton-line"></div>
                 <div class="skeleton-line-short"></div>
@@ -47,14 +83,16 @@
           </template>
         </div>
       </div>
-      <AddWisdomBodyDialog :visible.sync="addDeviceDialogVisible" @confirm="handleWisdomBodyAdded" />
-    </el-main>
-    <el-footer>
-      <version-footer />
-    </el-footer>
-    <chat-history-dialog :visible.sync="showChatHistory" :agent-id="currentAgentId" :agent-name="currentAgentName" />
-  </div>
+    </div>
 
+    <AddWisdomBodyDialog :visible.sync="addDeviceDialogVisible" @confirm="handleWisdomBodyAdded" />
+    <chat-history-dialog :visible.sync="showChatHistory" :agent-id="currentAgentId" :agent-name="currentAgentName" />
+    
+    <!-- 页脚 -->
+    <footer class="app-footer">
+      <version-footer />
+    </footer>
+  </div>
 </template>
 
 <script>
@@ -183,182 +221,385 @@ export default {
 </script>
 
 <style scoped>
+/* 全局样式 */
 .welcome {
-  min-width: 900px;
-  min-height: 506px;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background: linear-gradient(145deg, #e6eeff, #eff0ff);
-  background-size: cover;
-  /* 确保背景图像覆盖整个元素 */
-  background-position: center;
-  /* 从顶部中心对齐 */
-  -webkit-background-size: cover;
-  /* 兼容老版本WebKit浏览器 */
-  -o-background-size: cover;
-  /* 兼容老版本Opera浏览器 */
-}
-
-.add-device {
-  height: 195px;
-  border-radius: 15px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   position: relative;
-  overflow: hidden;
-  background: linear-gradient(269.62deg,
-      #e0e6fd 0%,
-      #cce7ff 49.69%,
-      #d3d3fe 100%);
+  overflow-x: hidden;
 }
 
-.add-device-bg {
-  width: 100%;
-  height: 100%;
-  text-align: left;
-  background-image: url("@/assets/home/main-top-bg.png");
-  overflow: hidden;
-  background-size: cover;
-  /* 确保背景图像覆盖整个元素 */
-  background-position: center;
-  /* 从顶部中心对齐 */
-  -webkit-background-size: cover;
-  /* 兼容老版本WebKit浏览器 */
-  -o-background-size: cover;
-  box-sizing: border-box;
-
-  /* 兼容老版本Opera浏览器 */
-  .hellow-text {
-    margin-left: 75px;
-    color: #3d4566;
-    font-size: 33px;
-    font-weight: 700;
-    letter-spacing: 0;
-  }
-
-  .hi-hint {
-    font-weight: 400;
-    font-size: 12px;
-    text-align: left;
-    color: #818cae;
-    margin-left: 75px;
-    margin-top: 5px;
-  }
-}
-
-.add-device-btn {
-  display: flex;
-  align-items: center;
-  margin-left: 75px;
-  margin-top: 15px;
-  cursor: pointer;
-
-  .left-add {
-    width: 105px;
-    height: 34px;
-    border-radius: 17px;
-    background: #5778ff;
-    color: #fff;
-    font-size: 14px;
-    font-weight: 500;
-    text-align: center;
-    line-height: 34px;
-  }
-
-  .right-add {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    background: #5778ff;
-    margin-left: -6px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-}
-
-.device-list-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 30px;
-  padding: 30px 0;
-}
-
-/* 在 DeviceItem.vue 的样式中 */
-.device-item {
-  margin: 0 !important;
-  /* 避免冲突 */
-  width: auto !important;
-}
-
-.footer {
-  font-size: 12px;
-  font-weight: 400;
-  margin-top: auto;
-  padding-top: 30px;
-  color: #979db1;
-  text-align: center;
-  /* 居中显示 */
-}
-
-/* 骨架屏动画 */
-@keyframes shimmer {
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-.skeleton-item {
-  background: #fff;
-  border-radius: 8px;
-  padding: 20px;
-  height: 120px;
-  position: relative;
-  overflow: hidden;
-  margin-bottom: 20px;
-}
-
-.skeleton-image {
-  width: 80px;
-  height: 80px;
-  background: #f0f2f5;
-  border-radius: 4px;
-  float: left;
-  position: relative;
-  overflow: hidden;
-}
-
-.skeleton-content {
-  margin-left: 100px;
-}
-
-.skeleton-line {
-  height: 16px;
-  background: #f0f2f5;
-  border-radius: 4px;
-  margin-bottom: 12px;
-  width: 70%;
-  position: relative;
-  overflow: hidden;
-}
-
-.skeleton-line-short {
-  height: 12px;
-  background: #f0f2f5;
-  border-radius: 4px;
-  width: 50%;
-}
-
-.skeleton-item::after {
+.welcome::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, rgba(120, 199, 255, 0.2) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* 主要内容区 */
+.main-content {
+  position: relative;
+  z-index: 1;
+  min-height: calc(100vh - 140px);
+}
+
+/* 英雄横幅区域 */
+.hero-banner {
+  padding: 40px 20px 60px;
+  color: white;
+}
+
+.hero-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+  min-height: 400px;
+}
+
+.hero-left {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.greeting-section {
+  text-align: left;
+}
+
+.main-greeting {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin: 0 0 10px 0;
+  background: linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 4px 20px rgba(255, 255, 255, 0.3);
+}
+
+.sub-greeting {
+  font-size: 1.3rem;
+  margin: 0 0 8px 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
+.welcome-desc {
+  font-size: 1rem;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-style: italic;
+}
+
+/* 操作按钮区域 */
+.action-section {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.primary-btn, .secondary-btn {
+  padding: 12px 24px;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 140px;
+  justify-content: center;
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  color: white;
+  box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+}
+
+.primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(255, 107, 107, 0.6);
+}
+
+.secondary-btn {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.secondary-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+/* 统计信息区域 */
+.stats-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 0;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: 4px;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* 右侧视觉区域 */
+.hero-right {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-visual {
+  position: relative;
+  width: 300px;
+  height: 300px;
+}
+
+.hero-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  animation: pulse 4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.05); }
+}
+
+.floating-card {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 16px;
+  color: white;
+  text-align: center;
+  animation: float 6s ease-in-out infinite;
+}
+
+.card-1 {
+  top: 20px;
+  right: 20px;
+  animation-delay: 0s;
+}
+
+.card-2 {
+  bottom: 60px;
+  left: 20px;
+  animation-delay: 2s;
+}
+
+.card-3 {
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation-delay: 4s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.card-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.card-text {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* 智能体列表区域 */
+.agents-section {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  margin: 0 20px;
+  border-radius: 20px 20px 0 0;
+  padding: 40px;
+  min-height: 400px;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.section-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin: 0 0 8px 0;
+}
+
+.section-subtitle {
+  font-size: 1.1rem;
+  color: #718096;
+  margin: 0;
+}
+
+.agents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 24px;
+}
+
+/* 骨架屏样式 */
+.skeleton-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  height: 140px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.skeleton-header {
+  width: 100%;
+  height: 24px;
+  background: #f7fafc;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.skeleton-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton-line {
+  height: 16px;
+  background: #f7fafc;
+  border-radius: 8px;
+  width: 70%;
+}
+
+.skeleton-line-short {
+  height: 12px;
+  background: #f7fafc;
+  border-radius: 6px;
   width: 50%;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.skeleton-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
   height: 100%;
   background: linear-gradient(90deg,
-      rgba(255, 255, 255, 0),
-      rgba(255, 255, 255, 0.3),
-      rgba(255, 255, 255, 0));
-  animation: shimmer 1.5s infinite;
+    transparent,
+    rgba(255, 255, 255, 0.6),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+/* 页脚 */
+.app-footer {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  padding: 20px;
+  margin-top: auto;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .hero-content {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    text-align: center;
+  }
+  
+  .main-greeting {
+    font-size: 2.5rem;
+  }
+  
+  .action-section {
+    justify-content: center;
+  }
+  
+  .agents-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .hero-visual {
+    width: 250px;
+    height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    margin: 0 10px;
+  }
+  
+  .hero-banner {
+    padding: 20px 10px 40px;
+  }
+  
+  .main-greeting {
+    font-size: 2rem;
+  }
 }
 </style>
