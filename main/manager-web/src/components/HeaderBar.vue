@@ -424,29 +424,12 @@ export default {
   max-width: 220px;
 }
 
-.custom-search-input /deep/ .el-input__inner {
-  height: 30px;
-  border-radius: 15px;
-  background-color: #fff;
-  border: 1px solid #e4e6ef;
-  padding-left: 15px;
-  font-size: 12px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 100%;
-}
-
 .search-icon {
   cursor: pointer;
   color: #909399;
   margin-right: 8px;
   font-size: 14px;
   line-height: 30px;
-}
-
-.custom-search-input /deep/ .el-input__suffix-inner {
-  display: flex;
-  align-items: center;
-  height: 100%;
 }
 
 .avatar-img {
@@ -597,7 +580,25 @@ export default {
 </style>
 
 <style lang="scss">
-/* 全局下拉菜单样式 - 不使用scoped */
+/* 全局ElementUI样式 - 不使用scoped */
+.custom-search-input .el-input__inner {
+  height: 30px;
+  border-radius: 15px;
+  background-color: #fff;
+  border: 1px solid #e4e6ef;
+  padding-left: 15px;
+  font-size: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
+}
+
+.custom-search-input .el-input__suffix-inner {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+/* 全局下拉菜单样式 */
 .el-dropdown-menu {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
