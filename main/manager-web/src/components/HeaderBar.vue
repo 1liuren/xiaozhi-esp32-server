@@ -424,7 +424,7 @@ export default {
   max-width: 220px;
 }
 
-.custom-search-input>>>.el-input__inner {
+.custom-search-input::v-deep .el-input__inner {
   height: 30px;
   border-radius: 15px;
   background-color: #fff;
