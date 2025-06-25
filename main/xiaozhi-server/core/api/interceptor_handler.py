@@ -17,7 +17,7 @@ class InterceptorHandler:
     async def handle_get(self, request):
         """处理GET请求 - 获取拦截器状态"""
         try:
-            interceptor = get_interceptor()
+            interceptor = get_interceptor(self.config)
             
             if not interceptor:
                 return web.json_response({
@@ -58,7 +58,7 @@ class InterceptorHandler:
             data = await request.json()
             action = data.get("action")
             
-            interceptor = get_interceptor()
+            interceptor = get_interceptor(self.config)
             if not interceptor:
                 return web.json_response({
                     "error": "拦截器未初始化",

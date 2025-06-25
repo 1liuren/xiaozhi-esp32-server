@@ -44,19 +44,19 @@ deploy_file() {
 }
 
 # 部署所有文件
-deploy_file "main/xiaozhi-server/core/interceptors/message_interceptor.py" "/app/core/interceptors/message_interceptor.py" "消息拦截器" 1 8 || exit 1
+deploy_file "main/xiaozhi-server/core/interceptors/message_interceptor.py" "/opt/core/interceptors/message_interceptor.py" "消息拦截器" 1 8 || exit 1
 
-deploy_file "main/xiaozhi-server/core/interceptors/custom_handlers.py" "/app/core/interceptors/custom_handlers.py" "自定义处理器" 2 8 || exit 1
+deploy_file "main/xiaozhi-server/core/interceptors/custom_handlers.py" "/opt/core/interceptors/custom_handlers.py" "自定义处理器" 2 8 || exit 1
 
-deploy_file "main/xiaozhi-server/core/api/interceptor_handler.py" "/app/core/api/interceptor_handler.py" "拦截器API处理器" 3 8 || exit 1
+deploy_file "main/xiaozhi-server/core/api/interceptor_handler.py" "/opt/core/api/interceptor_handler.py" "拦截器API处理器" 3 8 || exit 1
 
-deploy_file "main/xiaozhi-server/core/database/user_manager.py" "/app/core/database/user_manager.py" "用户数据库管理器" 4 8 || exit 1
+deploy_file "main/xiaozhi-server/core/database/user_manager.py" "/opt/core/database/user_manager.py" "用户数据库管理器" 4 8 || exit 1
 
-deploy_file "main/xiaozhi-server/core/api/user_handler.py" "/app/core/api/user_handler.py" "用户API处理器" 5 8 || exit 1
+deploy_file "main/xiaozhi-server/core/api/user_handler.py" "/opt/core/api/user_handler.py" "用户API处理器" 5 8 || exit 1
 
-deploy_file "main/xiaozhi-server/core/connection.py" "/app/core/connection.py" "WebSocket连接处理器" 6 8 || exit 1
+deploy_file "main/xiaozhi-server/core/connection.py" "/opt/core/connection.py" "WebSocket连接处理器" 6 8 || exit 1
 
-deploy_file "main/xiaozhi-server/core/http_server.py" "/app/core/http_server.py" "HTTP服务器" 7 8 || exit 1
+deploy_file "main/xiaozhi-server/core/http_server.py" "/opt/core/http_server.py" "HTTP服务器" 7 8 || exit 1
 
 # 重启容器
 echo -e "${YELLOW}[8/8] 正在重启Docker容器...${NC}"

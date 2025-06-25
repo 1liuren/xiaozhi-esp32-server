@@ -27,6 +27,11 @@ services:
       - ./core/providers/tts:/opt/xiaozhi-esp32-server/core/providers/tts
       # 模型文件挂接，很重要
       - ./models/SenseVoiceSmall/model.pt:/opt/xiaozhi-esp32-server/models/SenseVoiceSmall/model.pt
+      
+      - ../xiaozhi-server/core:/opt/xiaozhi-esp32-server/core
+      - ../xiaozhi-server/config:/opt/xiaozhi-esp32-server/config
+      - ../xiaozhi-server/plugins_func:/opt/xiaozhi-esp32-server/plugins_func
+      - ../xiaozhi-server/app.py:/opt/xiaozhi-esp32-server/app.py 
 
   # manager-api和manager-web模块
   xiaozhi-esp32-server-web:

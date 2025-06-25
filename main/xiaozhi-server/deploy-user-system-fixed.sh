@@ -26,9 +26,9 @@ fi
 
 # 创建必要的目录结构
 printf "${YELLOW}正在创建目录结构...${NC}\n"
-docker exec xiaozhi-esp32-server mkdir -p /opt/core/interceptors >/dev/null 2>&1
-docker exec xiaozhi-esp32-server mkdir -p /opt/core/api >/dev/null 2>&1
-docker exec xiaozhi-esp32-server mkdir -p /opt/core/database >/dev/null 2>&1
+docker exec xiaozhi-esp32-server mkdir -p /opt/xiaozhi-esp32-server/core/interceptors >/dev/null 2>&1
+docker exec xiaozhi-esp32-server mkdir -p /opt/xiaozhi-esp32-server/core/api >/dev/null 2>&1
+docker exec xiaozhi-esp32-server mkdir -p /opt/xiaozhi-esp32-server/core/database >/dev/null 2>&1
 printf "${GREEN}✅ 目录结构创建完成${NC}\n"
 
 # 部署文件函数
@@ -51,19 +51,19 @@ deploy_file() {
 }
 
 # 部署所有文件
-deploy_file "core/interceptors/message_interceptor.py" "/opt/core/interceptors/message_interceptor.py" "消息拦截器" 1 8 || exit 1
+deploy_file "core/interceptors/message_interceptor.py" "/opt/xiaozhi-esp32-server/core/interceptors/message_interceptor.py" "消息拦截器" 1 8 || exit 1
 
-deploy_file "core/interceptors/custom_handlers.py" "/opt/core/interceptors/custom_handlers.py" "自定义处理器" 2 8 || exit 1
+deploy_file "core/interceptors/custom_handlers.py" "/opt/xiaozhi-esp32-server/core/interceptors/custom_handlers.py" "自定义处理器" 2 8 || exit 1
 
-deploy_file "core/api/interceptor_handler.py" "/opt/core/api/interceptor_handler.py" "拦截器API处理器" 3 8 || exit 1
+deploy_file "core/api/interceptor_handler.py" "/opt/xiaozhi-esp32-server/core/api/interceptor_handler.py" "拦截器API处理器" 3 8 || exit 1
 
-deploy_file "core/database/user_manager.py" "/opt/core/database/user_manager.py" "用户数据库管理器" 4 8 || exit 1
+deploy_file "core/database/user_manager.py" "/opt/xiaozhi-esp32-server/core/database/user_manager.py" "用户数据库管理器" 4 8 || exit 1
 
-deploy_file "core/api/user_handler.py" "/opt/core/api/user_handler.py" "用户API处理器" 5 8 || exit 1
+deploy_file "core/api/user_handler.py" "/opt/xiaozhi-esp32-server/core/api/user_handler.py" "用户API处理器" 5 8 || exit 1
 
-deploy_file "core/connection.py" "/opt/core/connection.py" "WebSocket连接处理器" 6 8 || exit 1
+deploy_file "core/connection.py" "/opt/xiaozhi-esp32-server/core/connection.py" "WebSocket连接处理器" 6 8 || exit 1
 
-deploy_file "core/http_server.py" "/opt/core/http_server.py" "HTTP服务器" 7 8 || exit 1
+deploy_file "core/http_server.py" "/opt/xiaozhi-esp32-server/core/http_server.py" "HTTP服务器" 7 8 || exit 1
 
 # 重启容器
 printf "${YELLOW}[8/8] 正在重启Docker容器...${NC}\n"
