@@ -42,7 +42,7 @@ nav {
 }
 
 .el-message {
-  top: 45px !important;
+  top: 70px !important;
 }
 </style>
 <script>
@@ -64,26 +64,34 @@ export default {
     if (this.isCDNEnabled) {
       // 添加全局快捷键Alt+C用于显示缓存查看器
       document.addEventListener('keydown', this.handleKeyDown);
-      
+
       // 在全局对象上添加缓存检查方法，便于调试
       window.checkCDNCacheStatus = () => {
         this.showCacheViewer = true;
       };
-      
+
       // 在控制台输出提示信息
       console.info(
+<<<<<<< HEAD
         '%c[幻话服务] CDN缓存检查工具已加载', 
+=======
+        '%c[小智服务] CDN缓存检查工具已加载',
+>>>>>>> upstream/main
         'color: #409EFF; font-weight: bold;'
       );
       console.info(
         '按下 Alt+C 组合键或在控制台运行 checkCDNCacheStatus() 可以查看CDN缓存状态'
       );
-      
+
       // 检查Service Worker状态
       this.checkServiceWorkerStatus();
     } else {
       console.info(
+<<<<<<< HEAD
         '%c[幻话服务] CDN模式已禁用，使用本地打包资源', 
+=======
+        '%c[小智服务] CDN模式已禁用，使用本地打包资源',
+>>>>>>> upstream/main
         'color: #67C23A; font-weight: bold;'
       );
     }
@@ -108,19 +116,23 @@ export default {
           const registrations = await navigator.serviceWorker.getRegistrations();
           if (registrations.length > 0) {
             console.info(
-              '%c[幻话服务] Service Worker已注册', 
+              '%c[小智服务] Service Worker已注册',
               'color: #67C23A; font-weight: bold;'
             );
-            
+
             // 输出缓存状态到控制台
             setTimeout(async () => {
               const hasCaches = await logCacheStatus();
               if (!hasCaches) {
                 console.info(
+<<<<<<< HEAD
                   '%c[幻话服务] 还未检测到缓存，请刷新页面或等待缓存建立', 
+=======
+                  '%c[小智服务] 还未检测到缓存，请刷新页面或等待缓存建立',
+>>>>>>> upstream/main
                   'color: #E6A23C; font-weight: bold;'
                 );
-                
+
                 // 开发环境下提供额外提示
                 if (process.env.NODE_ENV === 'development') {
                   console.info(
@@ -136,10 +148,14 @@ export default {
             }, 2000);
           } else {
             console.info(
+<<<<<<< HEAD
               '%c[幻话服务] Service Worker未注册，CDN资源可能无法缓存', 
+=======
+              '%c[小智服务] Service Worker未注册，CDN资源可能无法缓存',
+>>>>>>> upstream/main
               'color: #F56C6C; font-weight: bold;'
             );
-            
+
             if (process.env.NODE_ENV === 'development') {
               console.info(
                 '%c[幻话服务] 在开发环境中，这是正常现象',
