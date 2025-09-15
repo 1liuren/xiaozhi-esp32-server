@@ -31,8 +31,8 @@ class TTSProvider(TTSProviderBase):
         self.audio_file_type = config.get("format", "wav")
         
         # 处理采样率配置
-        sample_rate = config.get("sample_rate", "48000")
-        self.sample_rate = int(sample_rate) if sample_rate else 48000
+        sample_rate = config.get("sample_rate", "16000")
+        self.sample_rate = int(sample_rate) if sample_rate else 16000
         
         # 支持自定义音色
         if config.get("private_voice"):

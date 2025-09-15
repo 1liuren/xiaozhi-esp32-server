@@ -59,6 +59,38 @@ class ASRProviderBase(ABC):
             have_voice = conn.client_have_voice
         
         conn.asr_audio.append(audio)
+        
+        # 🔥 防护机制1：限制音频缓冲区大小，防止无限累积
+        max_buffer_size = 300  # 约18秒音频（60ms/帧 * 300帧）
+        if len(conn.asr_audio) > max_buffer_size:
+            logger.bind(tag=TAG).warning(f"音频缓冲区过大({len(conn.asr_audio)}帧)，强制处理")
+            # 强制触发处理
+            asr_audio_task = conn.asr_audio.copy()
+            conn.asr_audio.clear()
+            conn.reset_vad_states()
+            if len(asr_audio_task) > 15:
+                await self.handle_voice_stop(conn, asr_audio_task)
+            return
+        
+        # 🔥 防护机制2：长时间有语音但没有停止检测时，强制处理
+        if have_voice and len(conn.asr_audio) > 150:  # 约9秒音频
+            # 检查是否长时间没有语音停止
+            if not hasattr(conn, 'last_voice_start_time'):
+                conn.last_voice_start_time = time.time()
+            elif time.time() - conn.last_voice_start_time > 10:  # 10秒强制处理
+                logger.bind(tag=TAG).warning(f"检测到长时间语音({time.time() - conn.last_voice_start_time:.1f}s)，强制处理")
+                asr_audio_task = conn.asr_audio.copy()
+                conn.asr_audio.clear()
+                conn.reset_vad_states()
+                conn.last_voice_start_time = time.time()  # 重置时间
+                if len(asr_audio_task) > 15:
+                    await self.handle_voice_stop(conn, asr_audio_task)
+                return
+        elif not have_voice:
+            # 重置语音开始时间
+            if hasattr(conn, 'last_voice_start_time'):
+                delattr(conn, 'last_voice_start_time')
+        
         if not have_voice and not conn.client_have_voice:
             conn.asr_audio = conn.asr_audio[-10:]
             return
@@ -67,6 +99,9 @@ class ASRProviderBase(ABC):
             asr_audio_task = conn.asr_audio.copy()
             conn.asr_audio.clear()
             conn.reset_vad_states()
+            # 重置语音开始时间
+            if hasattr(conn, 'last_voice_start_time'):
+                delattr(conn, 'last_voice_start_time')
 
             if len(asr_audio_task) > 15:
                 await self.handle_voice_stop(conn, asr_audio_task)

@@ -181,6 +181,7 @@ class TTSProvider(TTSProviderBase):
 
         # print(self.api_url, json.dumps(request_json, ensure_ascii=False))
         try:
+            logger.bind(tag=TAG).info(f"请求Aliyun TTS: {self.api_url}, {json.dumps(request_json, ensure_ascii=False)}")
             resp = requests.post(
                 self.api_url, json.dumps(request_json), headers=self.header
             )

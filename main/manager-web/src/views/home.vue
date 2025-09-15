@@ -234,6 +234,157 @@ export default {
   overflow-x: hidden;
 }
 
+.add-device-bg {
+  width: 100%;
+  height: 100%;
+  text-align: left;
+  background-image: url("@/assets/home/main-top-bg.png");
+  overflow: hidden;
+  background-size: cover;
+  /* 确保背景图像覆盖整个元素 */
+  background-position: center;
+  /* 从顶部中心对齐 */
+  -webkit-background-size: cover;
+  /* 兼容老版本WebKit浏览器 */
+  -o-background-size: cover;
+  box-sizing: border-box;
+
+  /* 兼容老版本Opera浏览器 */
+  .hellow-text {
+    margin-left: 75px;
+    color: #3d4566;
+    font-size: 33px;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
+  .hi-hint {
+    font-weight: 400;
+    font-size: 12px;
+    text-align: left;
+    color: #818cae;
+    margin-left: 75px;
+    margin-top: 5px;
+  }
+}
+
+.add-device-btn {
+  display: flex;
+  align-items: center;
+  margin-left: 75px;
+  margin-top: 15px;
+  cursor: pointer;
+
+  .left-add {
+    width: 105px;
+    height: 34px;
+    border-radius: 17px;
+    background: #5778ff;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    line-height: 34px;
+  }
+
+  .right-add {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #5778ff;
+    margin-left: -6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+.device-list-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 30px;
+  padding: 30px 0;
+}
+
+/* 在 DeviceItem.vue 的样式中 */
+.device-item {
+  margin: 0 !important;
+  /* 避免冲突 */
+  width: auto !important;
+}
+
+.footer {
+  font-size: 12px;
+  font-weight: 400;
+  margin-top: auto;
+  padding-top: 30px;
+  color: #979db1;
+  text-align: center;
+  /* 居中显示 */
+}
+
+/* 骨架屏动画 */
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.skeleton-item {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  height: 120px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.skeleton-image {
+  width: 80px;
+  height: 80px;
+  background: #f0f2f5;
+  border-radius: 4px;
+  float: left;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-content {
+  margin-left: 100px;
+}
+
+.skeleton-line {
+  height: 16px;
+  background: #f0f2f5;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  width: 70%;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-line-short {
+  height: 12px;
+  background: #f0f2f5;
+  border-radius: 4px;
+  width: 50%;
+}
+
+.skeleton-item::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255, 255, 255, 0.6),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
 .welcome::before {
   content: '';
   position: absolute;

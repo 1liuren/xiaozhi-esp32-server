@@ -11,8 +11,11 @@ import requests
 import opuslib_next
 from pydub import AudioSegment
 import copy
+from config.logger import setup_logging
 
 TAG = __name__
+logger = setup_logging()
+
 emoji_map = {
     "neutral": "😶",
     "happy": "🙂",
@@ -238,9 +241,11 @@ def audio_bytes_to_data(audio_bytes, file_type, is_opus=True):
     """
     if file_type == "p3":
         # 直接用p3解码
+        logger.bind(tag=TAG).info(f"解码p3音频数据: {len(audio_bytes)}")
         return p3.decode_opus_from_bytes(audio_bytes)
     else:
         # 其他格式用pydub
+        logger.bind(tag=TAG).info(f"解码pydub音频数据: {len(audio_bytes)}")
         audio = AudioSegment.from_file(
             BytesIO(audio_bytes), format=file_type, parameters=["-nostdin"]
         )

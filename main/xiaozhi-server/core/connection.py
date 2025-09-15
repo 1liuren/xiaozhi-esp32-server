@@ -17,8 +17,9 @@ from core.utils.util import (
     filter_sensitive_info,
 )
 from typing import Dict, Any
-from core.interceptors.message_interceptor import get_interceptor
 from collections import deque
+# from core.mcp.manager import MCPManager
+from core.interceptors.message_interceptor import get_interceptor
 from core.utils.modules_initialize import (
     initialize_modules,
     initialize_tts,
@@ -283,7 +284,7 @@ class ConnectionHandler:
     async def _route_message(self, message):
         """消息路由"""
         # 重置超时计时器
-        await self.reset_timeout()
+        # await self.reset_timeout()
         
         # 🔥 消息拦截 - 在这里截获所有用户消息
         if self.message_interceptor:
@@ -700,6 +701,17 @@ class ConnectionHandler:
         functions = None
         if self.intent_type == "function_call" and hasattr(self, "func_handler"):
             functions = self.func_handler.get_functions()
+            # 🔍 调试打印：显示可用的函数列表（修复OpenAI格式解析）
+            self.logger.bind(tag=TAG).info(f"🛠️  获取到 {len(functions) if functions else 0} 个可用函数")
+            if functions:
+                for i, func in enumerate(functions, 1):
+                    # 正确解析OpenAI格式：{type: "function", function: {name: ..., description: ...}}
+                    func_info = func.get('function', {})
+                    func_name = func_info.get('name', 'Unknown')
+                    func_desc = func_info.get('description', 'No description')
+                    self.logger.bind(tag=TAG).info(f"   {i}. {func_name} - {func_desc[:50]}...")
+        else:
+            self.logger.bind(tag=TAG).warning(f"🚫 无法获取函数: intent_type={self.intent_type}, has_func_handler={hasattr(self, 'func_handler')}")
         response_message = []
 
         try:
@@ -712,6 +724,8 @@ class ConnectionHandler:
                 memory_str = future.result()
 
             if self.intent_type == "function_call" and functions is not None:
+                # 🔍 调试打印：准备调用LLM with functions
+                self.logger.bind(tag=TAG).info(f"🤖 正在调用支持函数的LLM接口，函数数量: {len(functions)}")
                 # 使用支持functions的streaming接口
                 llm_responses = self.llm.response_with_functions(
                     self.session_id,
@@ -721,6 +735,8 @@ class ConnectionHandler:
                     functions=functions,
                 )
             else:
+                # 🔍 调试打印：使用普通LLM接口
+                self.logger.bind(tag=TAG).info(f"💬 使用普通LLM接口（无函数支持）")
                 llm_responses = self.llm.response(
                     self.session_id,
                     self.dialogue.get_llm_dialogue_with_memory(
@@ -756,12 +772,18 @@ class ConnectionHandler:
 
                 if tools_call is not None and len(tools_call) > 0:
                     tool_call_flag = True
-                    if tools_call[0].id is not None:
+                    # 🔍 调试打印：检测到工具调用
+                    self.logger.bind(tag=TAG).info(f"🔧 检测到工具调用：{len(tools_call)} 个工具")
+                    # 🛠️ 修复：只在非空且非None时才更新，避免空值覆盖正确值
+                    if tools_call[0].id is not None and tools_call[0].id.strip():
                         function_id = tools_call[0].id
-                    if tools_call[0].function.name is not None:
+                        self.logger.bind(tag=TAG).info(f"   🆔 函数ID: {function_id}")
+                    if tools_call[0].function.name is not None and tools_call[0].function.name.strip():
                         function_name = tools_call[0].function.name
+                        self.logger.bind(tag=TAG).info(f"   📝 函数名: {function_name}")
                     if tools_call[0].function.arguments is not None:
                         function_arguments += tools_call[0].function.arguments
+                        self.logger.bind(tag=TAG).info(f"   📄 函数参数: {tools_call[0].function.arguments}")
             else:
                 content = response
 
@@ -814,9 +836,12 @@ class ConnectionHandler:
                     self.tts_MessageText = text_buff
                     self.dialogue.put(Message(role="assistant", content=text_buff))
                 response_message.clear()
-                self.logger.bind(tag=TAG).debug(
-                    f"function_name={function_name}, function_id={function_id}, function_arguments={function_arguments}"
-                )
+                # 🔍 调试打印：函数调用详情
+                self.logger.bind(tag=TAG).info(f"🚀 准备执行函数调用:")
+                self.logger.bind(tag=TAG).info(f"   📝 函数名: {function_name}")
+                self.logger.bind(tag=TAG).info(f"   🆔 函数ID: {function_id}")
+                self.logger.bind(tag=TAG).info(f"   📄 参数: {function_arguments}")
+                
                 function_call_data = {
                     "name": function_name,
                     "id": function_id,
@@ -831,6 +856,20 @@ class ConnectionHandler:
                     self.loop,
                 ).result()
                 self._handle_function_result(result, function_call_data, depth=depth)
+                # 🔍 调试打印：检查func_handler状态
+                if hasattr(self, 'func_handler') and self.func_handler:
+                    self.logger.bind(tag=TAG).info(f"✅ func_handler 可用，开始执行...")
+                    # 使用统一工具处理器处理所有工具调用
+                    result = asyncio.run_coroutine_threadsafe(
+                        self.func_handler.handle_llm_function_call(
+                            self, function_call_data
+                        ),
+                        self.loop,
+                    ).result()
+                    self.logger.bind(tag=TAG).info(f"🎯 函数执行结果: {result.action if hasattr(result, 'action') else 'Unknown'}")
+                    self._handle_function_result(result, function_call_data)
+                else:
+                    self.logger.bind(tag=TAG).error(f"❌ func_handler 不可用! hasattr={hasattr(self, 'func_handler')}, is_none={getattr(self, 'func_handler', None) is None}")
 
         # 存储对话内容
         if len(response_message) > 0:

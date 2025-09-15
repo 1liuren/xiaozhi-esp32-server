@@ -32,6 +32,7 @@ services:
       - ../xiaozhi-server/config:/opt/xiaozhi-esp32-server/config
       - ../xiaozhi-server/plugins_func:/opt/xiaozhi-esp32-server/plugins_func
       - ../xiaozhi-server/app.py:/opt/xiaozhi-esp32-server/app.py 
+      - ../xiaozhi-server/music:/opt/xiaozhi-esp32-server/music
 
   # manager-api和manager-web模块
   xiaozhi-esp32-server-web:

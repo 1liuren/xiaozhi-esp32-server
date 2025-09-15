@@ -90,7 +90,13 @@ class MessageInterceptor:
             self._update_stats()
             
             # 异步处理请求（不阻塞主流程）
-            asyncio.create_task(self._process_request_async(request_info))
+            try:
+                loop = asyncio.get_event_loop()
+                if not loop.is_closed():
+                    asyncio.create_task(self._process_request_async(request_info))
+            except RuntimeError:
+                # 事件循环不可用时，静默跳过异步处理
+                pass
             
             # 记录日志
             if self.log_requests:
@@ -148,13 +154,18 @@ class MessageInterceptor:
     async def _process_request_async(self, request_info: RequestInfo):
         """异步处理请求（在后台线程中执行）"""
         try:
+            # 检查拦截器是否仍然启用
+            if not self.enabled:
+                return
+                
             # 在后台线程中执行处理逻辑，避免阻塞主流程
             loop = asyncio.get_event_loop()
-            await loop.run_in_executor(
-                self.executor, 
-                self._process_request_sync, 
-                request_info
-            )
+            if not loop.is_closed():
+                await loop.run_in_executor(
+                    self.executor, 
+                    self._process_request_sync, 
+                    request_info
+                )
         except Exception as e:
             self.logger.bind(tag=TAG).error(f"异步处理请求失败: {str(e)}")
     
@@ -262,8 +273,19 @@ class MessageInterceptor:
     
     def close(self):
         """关闭拦截器"""
-        self.executor.shutdown(wait=True)
-        self.logger.bind(tag=TAG).info("消息拦截器已关闭")
+        try:
+            self.enabled = False  # 停止接受新请求
+            self.executor.shutdown(wait=False)  # 不等待已提交的任务完成，避免阻塞
+            self.logger.bind(tag=TAG).info("消息拦截器已关闭")
+        except Exception as e:
+            self.logger.bind(tag=TAG).error(f"关闭消息拦截器失败: {str(e)}")
+            
+    def __del__(self):
+        """析构函数，确保资源清理"""
+        try:
+            self.close()
+        except:
+            pass
 
 
 # 全局拦截器实例

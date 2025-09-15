@@ -29,8 +29,10 @@ class VADProvider(VADProviderBase):
         self.vad_threshold = float(threshold) if threshold else 0.5
         self.vad_threshold_low = float(threshold_low) if threshold_low else 0.2
 
+        # 🔥 针对硬件设备优化：缩短静默阈值，提高响应速度
+        default_silence_ms = 600  # 从1000ms缩短到600ms，更快检测语音停止
         self.silence_threshold_ms = (
-            int(min_silence_duration_ms) if min_silence_duration_ms else 1000
+            int(min_silence_duration_ms) if min_silence_duration_ms else default_silence_ms
         )
 
         # 至少要多少帧才算有语音
@@ -77,6 +79,7 @@ class VADProvider(VADProviderBase):
                     stop_duration = time.time() * 1000 - conn.last_activity_time
                     if stop_duration >= self.silence_threshold_ms:
                         conn.client_voice_stop = True
+                        logger.bind(tag=TAG).debug(f"检测到语音停止，静默时长: {stop_duration:.0f}ms")
                 if client_have_voice:
                     conn.client_have_voice = True
                     conn.last_activity_time = time.time() * 1000

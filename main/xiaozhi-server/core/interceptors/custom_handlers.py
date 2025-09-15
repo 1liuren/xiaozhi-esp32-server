@@ -159,8 +159,13 @@ class UserBehaviorAnalyzer:
                     if msg_json.get("type") in ["listen", "hello"]:
                         if msg_json.get("type") == "listen" and msg_json.get("state") == "detect":
                             # 用户发送了实际的对话内容 - 在后台线程执行扣费
-                            loop = asyncio.get_event_loop()
-                            asyncio.create_task(self._deduct_balance_async(device_id))
+                            try:
+                                loop = asyncio.get_event_loop()
+                                if not loop.is_closed():
+                                    asyncio.create_task(self._deduct_balance_async(device_id))
+                            except RuntimeError:
+                                # 事件循环不可用时，静默跳过扣费
+                                pass
                             
                             # 检测用户实际说话内容
                             if "text" in msg_json:
@@ -176,8 +181,13 @@ class UserBehaviorAnalyzer:
                         
                         elif msg_json.get("type") == "hello":
                             # 用户连接时不扣费，但确保用户存在 - 在后台线程执行
-                            loop = asyncio.get_event_loop()
-                            asyncio.create_task(self._ensure_user_exists_async(device_id))
+                            try:
+                                loop = asyncio.get_event_loop()
+                                if not loop.is_closed():
+                                    asyncio.create_task(self._ensure_user_exists_async(device_id))
+                            except RuntimeError:
+                                # 事件循环不可用时，静默跳过用户检查
+                                pass
                         
                 except Exception as e:
                     self.logger.bind(tag=TAG).debug(f"处理用户扣费失败: {str(e)}")

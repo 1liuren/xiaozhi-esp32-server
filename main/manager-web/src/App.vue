@@ -72,11 +72,7 @@ export default {
 
       // 在控制台输出提示信息
       console.info(
-<<<<<<< HEAD
-        '%c[幻话服务] CDN缓存检查工具已加载', 
-=======
-        '%c[小智服务] CDN缓存检查工具已加载',
->>>>>>> upstream/main
+        '%c[小智服务] CDN缓存检查工具已加载', 
         'color: #409EFF; font-weight: bold;'
       );
       console.info(
@@ -87,11 +83,7 @@ export default {
       this.checkServiceWorkerStatus();
     } else {
       console.info(
-<<<<<<< HEAD
-        '%c[幻话服务] CDN模式已禁用，使用本地打包资源', 
-=======
         '%c[小智服务] CDN模式已禁用，使用本地打包资源',
->>>>>>> upstream/main
         'color: #67C23A; font-weight: bold;'
       );
     }
@@ -116,7 +108,7 @@ export default {
           const registrations = await navigator.serviceWorker.getRegistrations();
           if (registrations.length > 0) {
             console.info(
-              '%c[小智服务] Service Worker已注册',
+              '%c[小智服务] Service Worker已注册', 
               'color: #67C23A; font-weight: bold;'
             );
 
@@ -125,11 +117,7 @@ export default {
               const hasCaches = await logCacheStatus();
               if (!hasCaches) {
                 console.info(
-<<<<<<< HEAD
-                  '%c[幻话服务] 还未检测到缓存，请刷新页面或等待缓存建立', 
-=======
                   '%c[小智服务] 还未检测到缓存，请刷新页面或等待缓存建立',
->>>>>>> upstream/main
                   'color: #E6A23C; font-weight: bold;'
                 );
 
@@ -148,11 +136,7 @@ export default {
             }, 2000);
           } else {
             console.info(
-<<<<<<< HEAD
-              '%c[幻话服务] Service Worker未注册，CDN资源可能无法缓存', 
-=======
               '%c[小智服务] Service Worker未注册，CDN资源可能无法缓存',
->>>>>>> upstream/main
               'color: #F56C6C; font-weight: bold;'
             );
 
